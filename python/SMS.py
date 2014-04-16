@@ -36,7 +36,7 @@ class SMS:
 
 	# Please visit this page for the explanations of parameters:
 	# http://www.solutions4mobiles.com/downloads/documents/SMS_HTTP_API_V%7C7.7%7C.pdf
-	params = {
+	default_params = {
 		'username': 'username',
 		'password': 'password',
 		'provider': 'solutions4mobiles.com',
@@ -51,7 +51,7 @@ class SMS:
 
 	def __init__(self, **kwargs):
 		"""
-		Update (replace) params dictionary with given arguments
+		Update (replace) default params dictionary with given arguments
 		An additional parameter is 'hostname', e.g: 192.168.1.2 or www.myhost.com
 		Note: IPADDRESS (hostname), username and password are
 		provided to users by their Account Managers by email.
@@ -60,8 +60,11 @@ class SMS:
 			for key, value in kwargs.items():
 				if key == 'hostname':
 					self.__generate_url(value)
-				elif key in self.params:
-					self.params[key] = value
+				elif key in self.default_params:
+					self.default_params[key] = value
+
+		# Create attributes from the keys of params dictionary
+		self.__populate_attributes()
 
 	def __generate_url(self, ipaddress):
 		url = urlparse.urlparse(ipaddress)
@@ -73,6 +76,18 @@ class SMS:
 		self.netloc = new_url
 		self.send_url = '%s%s%s' % (self.scheme, new_url, self.send_path)
 		self.balance_url = '%s%s%s' % (self.scheme, new_url, self.balance_path)
+
+	def __populate_attributes(self):
+		for key, value in self.default_params.items():
+			setattr(self, key, value)
+
+	def __update_attributes(self):
+		for key, value in self.default_params.items():
+			if key in self.__dict__:
+				try:
+					self.default_params[key] = getattr(self, key)
+				except:
+					continue
 
 	# Returns:
     	# OK		Successfully Sent
@@ -90,5 +105,6 @@ class SMS:
     	# if showDLR is set to 1 a unique id for the delivery report of this SMS is returned with the OK return value.
     # 
 	def send(self):
-		request = requests.get(self.send_url, params=self.params)
+		self.__update_attributes()
+		request = requests.get(self.send_url, params=self.default_params)
 		return request.text
