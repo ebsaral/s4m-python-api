@@ -1,4 +1,5 @@
 <h1>sms-python-api</h1>
+<p>version: 0.8</p>
 ==============
 
 <h2>solutions4mobiles SMS Python API</h2>
