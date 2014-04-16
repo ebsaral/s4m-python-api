@@ -9,7 +9,12 @@
 <li><a href="http://docs.python-requests.org/en/latest/">python requests</a></li>
 </ul>
 
-
+<h3>Usage:</h3>
+<ul>
+<li>Initialize SMS class with arguments:<br/><code>sms = SMS(hostname='123.123.123.123', username='my_username', password='my_password')</code></li>
+<li>or without arguments: <code>sms = SMS()</code>. Then update any of attributes if you want:<br/><code>sms.hostname = '123.123.123.123'</code>, <code>sms.username = 'my_username'</code>, <code>sms.password = 'my_password'</code></li>
+<li>Finally, fly your SMS: <code>sms.send()</code></li>
+</ul>
 
 <p>This Python class is written by using examples from
 http://www.solutions4mobiles.com/en/developer-network/apis.html</p>

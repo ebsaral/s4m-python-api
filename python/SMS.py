@@ -25,14 +25,14 @@ import urlparse
 class SMS:
 	# Naming with rescect to urlparse library
 	scheme = 'http://'
-	netloc = 'solutions4mobiles.com'
+	hostname = 'solutions4mobiles.com'
 	
 	send_path = '/bulksms/bulksend.go'
 	balance_path = '/bulksms/getBALANCE.go'
 
 	# Request url
-	send_url = scheme + netloc + send_path
-	balance_url = scheme + netloc + balance_path
+	send_url = scheme + hostname + send_path
+	balance_url = scheme + hostname + balance_path
 
 	# Please visit this page for the explanations of parameters:
 	# http://www.solutions4mobiles.com/downloads/documents/SMS_HTTP_API_V%7C7.7%7C.pdf
@@ -59,23 +59,25 @@ class SMS:
 		if kwargs:
 			for key, value in kwargs.items():
 				if key == 'hostname':
-					self.__generate_url(value)
+					self.__refresh_url(new_hostname=value)
 				elif key in self.default_params:
 					self.default_params[key] = value
 
 		# Create attributes from the keys of params dictionary
 		self.__populate_attributes()
 
-	def __generate_url(self, ipaddress):
-		url = urlparse.urlparse(ipaddress)
-		if url.netloc:
-			new_url = url.netloc + url.path
-		else:
-			new_url = url.path
+	def __refresh_url(self, new_hostname=None):
+		if new_hostname:
+			url = urlparse.urlparse(new_hostname)
+			if url.netloc:
+				new_url = url.netloc + url.path
+			else:
+				new_url = url.path
 
-		self.netloc = new_url
-		self.send_url = '%s%s%s' % (self.scheme, new_url, self.send_path)
-		self.balance_url = '%s%s%s' % (self.scheme, new_url, self.balance_path)
+			self.hostname = new_url
+
+		self.send_url = '%s%s%s' % (self.scheme, self.hostname, self.send_path)
+		self.balance_url = '%s%s%s' % (self.scheme, self.hostname, self.balance_path)
 
 	def __populate_attributes(self):
 		for key, value in self.default_params.items():
@@ -104,7 +106,16 @@ class SMS:
     		# ERROR999	Invalid HTTP Request
     	# if showDLR is set to 1 a unique id for the delivery report of this SMS is returned with the OK return value.
     # 
-	def send(self):
+	def send(self, text=False):
+		"""
+		You have to set text as True if you would like to get
+		errors listed above, otherwise you will get a request object
+		"""
+		self.__refresh_url()
 		self.__update_attributes()
+
 		request = requests.get(self.send_url, params=self.default_params)
-		return request.text
+		if text:
+			return request.text
+		else:
+			return request
