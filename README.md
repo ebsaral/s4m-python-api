@@ -1,4 +1,4 @@
-<h1>sms-python-api</h1>
+<h1>s4m-python-api</h1>
 <p>version: 0.8</p>
 ==============
 
